@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
+import axios from "axios";
 import "./App.css";
 import GenerateQuote from './GenerateQuote';
 import DisplayQuote from './DisplayQuote';
@@ -15,22 +15,22 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      working: true
-    };
-    this.state = {
-      quote: sampleQuote
+      quote: null
     };
   }
 
-  handleClick = () => {
-    this.setState({ working: !this.state.working });
-  };
+  componentDidMount() {
+    setTimeout(
+     () => this.getQuote(), 1000
+    )
+
+  }
 
   getQuote() {
-    fetch("https://thesimpsonsquoteapi.glitch.me/quotes?count=num")
-      .then(response => response.json())
+    axios
+    .get("https://thesimpsonsquoteapi.glitch.me/quotes?count=num")
+      .then(response => response.data)
       .then(data => {
-        // Une fois les données récupérées, on va mettre à jour notre state avec les nouvelles données
         this.setState({
           quote: data[0],
         });
@@ -40,15 +40,13 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className={this.state.working ? "App-logo" : "App-logo-spin"} alt="logo" />
-          <button onClick={this.handleClick}>Working?</button>
-          <br />
-          <h1 className="App-title">Simpsons Quotes</h1>
-        </header>
         <br/>
         <GenerateQuote selectQuote={() => this.getQuote()} />
-        <DisplayQuote quote={this.state.quote} />
+        { 
+          this.state.quote 
+          ? <DisplayQuote quote={this.state.quote} />
+          : <p className="noData">NO DATA</p>
+        }
         <br/>
       </div>
     );
